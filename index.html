@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#09090F" />
+<title>OTAKU ID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<style>
+:root{--bg:#09090F;--s1:#151522;--s2:#202033;--vio:#8B5CF6;--vio2:#A78BFA;--cy:#22D3EE;--tx:#F8FAFC;--mu:#A1A1B8;--bad:#F87171;--ok:#34D399}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+ background-image:radial-gradient(900px 500px at 85% -10%,rgba(139,92,246,.18),transparent 60%),radial-gradient(700px 420px at -10% 10%,rgba(34,211,238,.1),transparent 60%);background-attachment:fixed}
+h1,h2,h3,.disp{font-family:Rajdhani,Inter,sans-serif;letter-spacing:.03em;margin:0}
+h1{font-size:2.2rem;line-height:1.1}h2{font-size:1.3rem}
+a{color:var(--cy);text-decoration:none}
+:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:20px 18px 110px}
+.narrow{max-width:440px;margin:0 auto;padding:36px 18px}
+.logo{font-family:Rajdhani;font-weight:700;letter-spacing:.18em;font-size:1.5rem}
+.logo b{background:linear-gradient(90deg,var(--vio2),var(--cy));-webkit-background-clip:text;background-clip:text;color:transparent}
+.panel{background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;margin-bottom:16px}
+.glass{background:rgba(21,21,34,.72);border:1px solid rgba(139,92,246,.3);border-radius:16px;padding:20px;backdrop-filter:blur(10px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:12px;border:1px solid rgba(139,92,246,.5);background:var(--s1);color:var(--tx);font:600 14px Inter;cursor:pointer}
+.btn:hover{border-color:var(--cy)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.pri{background:linear-gradient(90deg,var(--vio),#6d4be0);border:0;box-shadow:0 0 22px rgba(139,92,246,.35)}
+.btn.bad{border-color:rgba(248,113,113,.6);color:var(--bad);background:rgba(248,113,113,.08)}
+.btn.ghost{border:0;background:transparent;color:var(--mu)}
+.btn.block{width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.sp{justify-content:space-between}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+label{display:block;font-weight:500;font-size:13px;margin:14px 0 6px}
+input{width:100%;min-height:44px;background:var(--s2);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:0 14px;color:var(--tx);font:14px Inter}
+input:focus{border-color:var(--cy);outline:none}
+.err{color:var(--bad);font-size:12px;margin-top:4px}.hint{color:var(--mu);font-size:12px;margin-top:4px}.mu{color:var(--mu)}
+.alert{border:1px solid rgba(248,113,113,.5);color:var(--bad);background:var(--s2);border-radius:12px;padding:10px 14px;font-size:13px;margin:12px 0}
+.alert.ok{border-color:rgba(52,211,153,.5);color:var(--ok)}.alert.info{border-color:rgba(34,211,238,.5);color:var(--cy)}
+.card{position:relative;overflow:hidden;max-width:360px;margin:0 auto;border-radius:24px;border:1px solid rgba(139,92,246,.5);background:linear-gradient(135deg,#1a1a2e,var(--s1) 50%,#0e1a26);padding:20px;box-shadow:0 0 28px rgba(139,92,246,.35)}
+.card:before{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:rgba(139,92,246,.3);filter:blur(50px)}
+.card:after{content:"";position:absolute;left:-40px;bottom:-60px;width:170px;height:170px;border-radius:50%;background:rgba(34,211,238,.2);filter:blur(50px)}
+.card>*{position:relative;z-index:1}
+.av{border-radius:50%;object-fit:cover;border:2px solid rgba(139,92,246,.6);background:var(--s2);display:grid;place-items:center;color:var(--mu);flex:none}
+.kv{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);padding:6px 0;font-size:14px}.kv span:first-child{color:var(--mu);font-size:12px}
+.qrimg{background:#fff;border-radius:14px;padding:8px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(21,21,34,.96);border-top:1px solid rgba(255,255,255,.1);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);z-index:40}
+.nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60px;font-size:11px;color:var(--mu);gap:2px}.nav a.on{color:var(--cy)}.nav i{font-style:normal;font-size:20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.bar{height:8px;border-radius:99px;background:var(--s2);overflow:hidden}.bar>div{height:100%;background:linear-gradient(90deg,var(--vio),var(--cy))}
+.steps{display:flex;gap:6px;margin:14px 0}.steps i{flex:1;height:6px;border-radius:9px;background:var(--s2)}.steps i.d{background:var(--cy)}.steps i.c{background:var(--vio)}
+#toasts{position:fixed;top:12px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:100;pointer-events:none;padding:0 14px}
+.toast{background:var(--s1);border:1px solid rgba(34,211,238,.4);border-radius:12px;padding:10px 14px;font-size:13px;max-width:420px}.toast.bad{border-color:rgba(248,113,113,.6)}.toast.ok{border-color:rgba(52,211,153,.5)}
+.sw{position:relative;width:54px;height:30px;border-radius:99px;border:0;background:var(--s2);cursor:pointer;flex:none}.sw:after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .15s}.sw.on{background:var(--vio)}.sw.on:after{left:27px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:18px;z-index:60}.modal>div{max-width:380px;width:100%}
+video{width:100%;aspect-ratio:1;object-fit:cover;border-radius:24px;background:var(--s1);border:1px solid rgba(139,92,246,.5)}
+.demo{font-size:11px;color:var(--mu);text-align:center;margin-top:8px}
+@media (min-width:768px){.nav{left:50%;transform:translateX(-50%);max-width:560px;border-radius:18px 18px 0 0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}.float{animation:fl 6s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div id="toasts" role="status" aria-live="polite"></div>
+<div id="app"></div>
+
+<script>
+/* ================= CONFIG ================= */
+// Publishable key only. NEVER put a service-role/secret key in this file.
+const SUPABASE_URL = 'https://chzjeenblrnwlekhuhfk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_9D0IDiZjPzB-3tv72o5jeQ_cox1lard';
+// Set to your hosted URL (e.g. 'https://otaku-id.pages.dev/otaku-id.html') so QR codes are stable. Empty = use current page.
+const SITE_URL = '';
+const BUCKET = 'avatars';
+
+/* ================= HELPERS ================= */
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' } });
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const base = () => (SITE_URL || location.origin + location.pathname).replace(/#.*$/, '');
+const profileUrl = (u) => `${base()}#/u/${u}`;
+const avatarUrl = (p) => (p ? sb.storage.from(BUCKET).getPublicUrl(p).data.publicUrl : null);
+const USER_RE = /^[a-z0-9_]{3,20}$/;
+const normUser = (v) => v.trim().replace(/^@+/, '').toLowerCase();
+const go = (p) => { location.hash = p; };
+
+function toast(text, kind = '') {
+  const el = document.createElement('div'); el.className = 'toast ' + kind; el.textContent = text;
+  $('#toasts').appendChild(el); setTimeout(() => el.remove(), 4500);
+}
+const S = { session: null, profile: null, priv: null, settings: null, ready: false };
+
+/* ---- validation ---- */
+const vEmail = (v) => (!v.trim() ? 'Email is required.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) ? null : 'Enter a valid email.');
+const vPass = (v) => (v.length < 8 ? 'Use at least 8 characters.' : !/[A-Za-z]/.test(v) || !/[0-9]/.test(v) ? 'Include a letter and a number.' : null);
+const vUser = (v) => { const u = normUser(v); return !u ? 'Username is required.' : u.length < 3 ? 'Use at least 3 characters.' : u.length > 20 ? 'Use at most 20 characters.' : USER_RE.test(u) ? null : 'Only letters, numbers and underscores.'; };
+const vName = (v) => (!v.trim() ? 'Display name is required.' : v.trim().length > 40 ? 'Keep it under 40 characters.' : null);
+const vFav = (v) => (v.trim().length > 80 ? 'Keep it under 80 characters.' : null);
+const vPhone = (v) => (!v.trim() || /^\+?[0-9 ()-]{7,20}$/.test(v.trim()) ? null : 'Enter a valid phone number.');
+const ageOf = (d) => { const b = new Date(d + 'T00:00:00'), n = new Date(); let a = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--; return a; };
+const vDob = (v) => (!v ? 'Date of birth is required.' : isNaN(new Date(v)) || new Date(v).getFullYear() < 1900 ? 'Enter a valid date.' : ageOf(v) < 13 ? 'You must be at least 13.' : null);
+function parseIg(v) {
+  const raw = v.trim(); if (!raw) return { value: null };
+  let h = raw;
+  if (/instagram\.com/i.test(raw) || /^https?:\/\//i.test(raw)) {
+    try { const u = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw); if (u.hostname.replace(/^www\./, '').toLowerCase() !== 'instagram.com') return { error: 'Only instagram.com links are allowed.' }; h = u.pathname.split('/').filter(Boolean)[0] || ''; } catch { return { error: 'That link looks invalid.' }; }
+  }
+  h = h.replace(/^@+/, '');
+  return /^[A-Za-z0-9._]{1,30}$/.test(h) ? { value: h } : { error: 'Instagram usernames use letters, numbers, . and _.' };
+}
+function parseScanned(text) {
+  const raw = text.trim(); if (!raw) return { error: 'Nothing to open.' };
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(raw)) { const u = normUser(raw); return USER_RE.test(u) ? { username: u } : { error: 'That does not look like a valid username.' }; }
+  let url; try { url = new URL(raw); } catch { return { error: 'That QR code is not a valid link.' }; }
+  if (!/^https?:$|^file:$/.test(url.protocol)) return { error: 'Only OTAKU ID links can be opened.' };
+  const mine = new URL(base(), location.href);
+  if (url.origin !== mine.origin || url.pathname !== mine.pathname) return { error: 'This QR code is not an OTAKU ID profile.' };
+  const m = url.hash.match(/^#\/u\/([A-Za-z0-9_]{3,20})\/?$/);
+  return m ? { username: m[1].toLowerCase() } : { error: 'This QR code does not point to a profile.' };
+}
+const dbErr = (e) => e.code === '23505' ? 'That username is already taken.' : e.code === '42P01' || /does not exist/i.test(e.message) ? 'Database tables are missing. Run the SQL migration in the OTAKU ID Supabase project.' : /row-level security/i.test(e.message) ? 'You are not allowed to do that.' : e.message;
+const qrData = (t, w = 640) => QRCode.toDataURL(t, { width: w, margin: 2, errorCorrectionLevel: 'M', color: { dark: '#09090F', light: '#FFFFFF' } });
+
+/* ---- shared UI bits ---- */
+const logo = '<span class="logo"><b>OTAKU</b> ID</span>';
+const avatar = (src, name, size = 56) => src ? `<img class="av" crossorigin="anonymous" src="${esc(src)}" alt="${esc(name)} avatar" style="width:${size}px;height:${size}px">` : `<span class="av" style="width:${size}px;height:${size}px" aria-label="No avatar">👤</span>`;
+function idCard(d, qr, avSrc) {
+  const row = (l, v) => `<div class="kv"><span>${l}</span><span style="text-align:right">${esc(v) || '—'}</span></div>`;
+  return `<div class="card" id="idcard">
+    <div class="row sp">${logo.replace('1.5rem', '1.1rem')}<span style="font-size:10px;letter-spacing:.15em;color:var(--cy);border:1px solid rgba(34,211,238,.4);border-radius:99px;padding:2px 8px">✦ MEMBER</span></div>
+    <div class="row" style="margin-top:18px;flex-wrap:nowrap">${avatar(avSrc ?? avatarUrl(d.avatar_path), d.display_name, 76)}
+      <div style="min-width:0"><div class="disp" style="font-size:1.5rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.display_name)}</div><div style="color:var(--cy);font-size:14px">@${esc(d.username)}</div></div></div>
+    <div style="margin-top:16px">${row('Favourite anime', d.favourite_anime)}${row('Favourite (M)', d.favourite_male_character)}${row('Favourite (F)', d.favourite_female_character)}</div>
+    <div class="row sp" style="margin-top:16px;flex-wrap:nowrap;align-items:flex-end"><div><div style="font-size:10px;letter-spacing:.15em;color:var(--mu)">OTAKU ID</div><div style="font-family:monospace">OID-${esc(d.public_id)}</div></div>
+    ${qr ? `<img class="qrimg" src="${qr}" alt="QR code for @${esc(d.username)}" width="96" height="96" style="padding:6px">` : ''}</div></div>`;
+}
+function field(id, label, val = '', o = {}) {
+  return `<label for="${id}">${label}</label><input id="${id}" value="${esc(val)}" ${o.type ? `type="${o.type}"` : ''} ${o.ph ? `placeholder="${esc(o.ph)}"` : ''} ${o.ac ? `autocomplete="${o.ac}"` : ''} ${o.max ? `maxlength="${o.max}"` : ''} ${o.attrs || ''}><div class="err" id="${id}-e"></div>${o.hint ? `<div class="hint">${o.hint}</div>` : ''}`;
+}
+const setErr = (id, m) => { const e = $('#' + id + '-e'); if (e) e.textContent = m || ''; return !!m; };
+const val = (id) => ($('#' + id)?.value ?? '');
+function nav(active) {
+  const it = [['/profile', '👤', 'Profile'], ['/search', '🔍', 'Search'], ['/scan', '📷', 'Scan'], ['/my-qr', '▦', 'My QR']];
+  return `<nav class="nav" aria-label="Main">${it.map(([p, i, l]) => `<a href="#${p}" class="${active === p ? 'on' : ''}"><i>${i}</i>${l}</a>`).join('')}</nav>`;
+}
+function shell(active, inner) {
+  return `<div class="wrap"><div class="top"><a href="#/dashboard">${logo}</a><a href="#/settings" class="btn ghost" aria-label="Settings">⚙</a></div>${inner}</div>${nav(active)}`;
+}
+const app = $('#app');
+const google = async (btn) => { btn.disabled = true; const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: base() } }); if (error) { btn.disabled = false; toast(error.message, 'bad'); } };
+const googleBtn = `<button class="btn block" id="g">Continue with Google</button>`;
+const orLine = `<div class="mu" style="text-align:center;font-size:12px;margin:14px 0">— or —</div>`;
+
+/* ================= DATA ================= */
+async function loadProfile() {
+  const uid = S.session?.user.id;
+  if (!uid) { S.profile = S.priv = S.settings = null; return null; }
+  const [p, pr, st] = await Promise.all([
+    sb.from('profiles').select('*').eq('id', uid).maybeSingle(),
+    sb.from('private_profiles').select('*').eq('user_id', uid).maybeSingle(),
+    sb.from('profile_settings').select('*').eq('user_id', uid).maybeSingle(),
+  ]);
+  const err = p.error || pr.error || st.error;
+  S.profile = p.data; S.priv = pr.data; S.settings = st.data;
+  return err ? dbErr(err) : null;
+}
+async function saveProfile({ isNew, v, file }) {
+  const uid = S.session.user.id; const ig = parseIg(v.instagram); if (ig.error) throw new Error(ig.error);
+  let newPath = null;
+  if (file) {
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    newPath = `${uid}/avatar-${Date.now()}.${ext}`;
+    const up = await sb.storage.from(BUCKET).upload(newPath, file, { contentType: file.type, upsert: false });
+    if (up.error) throw new Error('Avatar upload failed: ' + up.error.message);
+  }
+  const row = { username: normUser(v.username), display_name: v.display_name.trim(), favourite_anime: v.favourite_anime.trim() || null, favourite_male_character: v.favourite_male_character.trim() || null, favourite_female_character: v.favourite_female_character.trim() || null, instagram_username: ig.value, ...(newPath ? { avatar_path: newPath } : {}) };
+  const r = isNew ? await sb.from('profiles').insert({ id: uid, ...row }) : await sb.from('profiles').update(row).eq('id', uid);
+  if (r.error) { if (newPath) await sb.storage.from(BUCKET).remove([newPath]); throw new Error(dbErr(r.error)); }
+  const pr = await sb.from('private_profiles').upsert({ user_id: uid, date_of_birth: v.date_of_birth || null, phone_number: v.phone_number.trim() || null }, { onConflict: 'user_id' });
+  if (pr.error) throw new Error(dbErr(pr.error));
+  if (isNew) { const st = await sb.from('profile_settings').upsert({ user_id: uid }, { onConflict: 'user_id', ignoreDuplicates: true }); if (st.error) throw new Error(dbErr(st.error)); }
+  if (newPath && S.profile?.avatar_path) await sb.storage.from(BUCKET).remove([S.profile.avatar_path]);
+}
+function pushRecent(e) { try { const k = 'otakuid.recent.v1'; const a = JSON.parse(localStorage.getItem(k) || '[]').filter((x) => x.username !== e.username); localStorage.setItem(k, JSON.stringify([e, ...a].slice(0, 6))); } catch {} }
+function getRecent() { try { return JSON.parse(localStorage.getItem('otakuid.recent.v1') || '[]').slice(0, 6); } catch { return []; } }
+
+/* ================= PAGES ================= */
+let cleanup = null; // stops camera etc. when leaving a page
+
+function landing() {
+  const demo = { public_id: 'SAMPLE0001', username: 'your_name', display_name: 'Your Name Here', avatar_path: null, favourite_anime: 'Your favourite anime', favourite_male_character: 'Your pick', favourite_female_character: 'Your pick' };
+  app.innerHTML = `<div class="wrap" style="max-width:960px"><div class="top">${logo}<a class="btn ghost" href="#/login">Log in</a></div>
+  <div style="display:grid;gap:30px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));align-items:center;padding:20px 0">
+   <div><p style="color:var(--cy);letter-spacing:.2em;font-size:12px;font-weight:600;text-transform:uppercase">Your Anime Identity. Your Otaku World.</p>
+    <h1 style="font-size:3.2rem">Your Anime Identity <span style="background:linear-gradient(90deg,var(--vio2),var(--cy));-webkit-background-clip:text;background-clip:text;color:transparent">Starts Here</span></h1>
+    <p class="mu">Build a collectible digital ID card, share it with a QR code, and discover other anime fans.</p>
+    <div class="row"><a class="btn pri" href="#/signup">Create My Otaku ID</a><a class="btn" href="#/search">Explore Anime Fans</a></div></div>
+   <div class="float">${idCard(demo)}<div class="demo">Sample card — demo only</div></div></div>
+  <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+   <div class="glass"><h2>▦ QR identity</h2><p class="mu">Your QR opens your public profile — nothing private inside.</p></div>
+   <div class="glass"><h2>🔍 Fan discovery</h2><p class="mu">Find other otaku by username.</p></div>
+   <div class="glass"><h2>✦ Make it yours</h2><p class="mu">Show your favourite anime and characters.</p></div></div></div>`;
+}
+
+function loginPage() {
+  app.innerHTML = `<div class="narrow"><a href="#/">${logo}</a><div class="glass" style="margin-top:24px"><h1>Welcome back</h1><p class="mu">Log in to your Otaku ID.</p>
+   ${googleBtn}${orLine}<form id="f" novalidate>${field('em', 'Email', '', { type: 'email', ac: 'email' })}${field('pw', 'Password', '', { type: 'password', ac: 'current-password' })}<div id="fe"></div>
+   <button class="btn pri block" style="margin-top:16px" id="go">Log in</button></form>
+   <div class="row sp" style="margin-top:14px;font-size:13px"><a href="#/forgot">Forgot password?</a><a href="#/signup" class="mu">Create account</a></div></div></div>`;
+  $('#g').onclick = (e) => google(e.target);
+  $('#f').onsubmit = async (e) => {
+    e.preventDefault();
+    const a = setErr('em', vEmail(val('em'))), b = setErr('pw', val('pw') ? '' : 'Password is required.'); $('#fe').innerHTML = '';
+    if (a || b) return;
+    $('#go').disabled = true;
+    const { error } = await sb.auth.signInWithPassword({ email: val('em').trim(), password: val('pw') });
+    $('#go').disabled = false;
+    if (error) $('#fe').innerHTML = `<div class="alert" role="alert">${esc(/not confirmed/i.test(error.message) ? 'Please verify your email first — check your inbox.' : error.message)}</div>`;
+  };
+}
+function signupPage() {
+  app.innerHTML = `<div class="narrow"><a href="#/">${logo}</a><div class="glass" style="margin-top:24px"><h1>Create your Otaku ID</h1>
+   ${googleBtn}${orLine}<form id="f" novalidate>${field('em', 'Email', '', { type: 'email', ac: 'email' })}${field('pw', 'Password', '', { type: 'password', ac: 'new-password', hint: '8+ characters with a letter and a number.' })}${field('pw2', 'Confirm password', '', { type: 'password', ac: 'new-password' })}<div id="fe"></div>
+   <button class="btn pri block" style="margin-top:16px" id="go">Create account</button></form>
+   <p class="mu" style="text-align:center;font-size:13px">Already have an account? <a href="#/login">Log in</a></p></div></div>`;
+  $('#g').onclick = (e) => google(e.target);
+  $('#f').onsubmit = async (e) => {
+    e.preventDefault();
+    const r = [setErr('em', vEmail(val('em'))), setErr('pw', vPass(val('pw'))), setErr('pw2', val('pw2') === val('pw') ? '' : 'Passwords do not match.')]; $('#fe').innerHTML = '';
+    if (r.some(Boolean)) return;
+    $('#go').disabled = true;
+    const { data, error } = await sb.auth.signUp({ email: val('em').trim(), password: val('pw'), options: { emailRedirectTo: base() } });
+    $('#go').disabled = false;
+    if (error) return ($('#fe').innerHTML = `<div class="alert" role="alert">${esc(error.message)}</div>`);
+    if (!data.session) app.innerHTML = `<div class="narrow"><div class="glass" style="text-align:center"><h1>Check your inbox ✉</h1><p class="mu">We sent a verification link to <b style="color:var(--tx)">${esc(val('em').trim())}</b>. Open it to activate your Otaku ID.</p><a class="btn" href="#/login">Back to log in</a></div></div>`;
+  };
+}
+function forgotPage() {
+  app.innerHTML = `<div class="narrow"><a href="#/">${logo}</a><div class="glass" style="margin-top:24px"><h1>Reset password</h1><form id="f" novalidate>${field('em', 'Email', '', { type: 'email', ac: 'email' })}<div id="fe"></div><button class="btn pri block" style="margin-top:16px" id="go">Send reset link</button></form><p style="text-align:center"><a href="#/login">Back to log in</a></p></div></div>`;
+  $('#f').onsubmit = async (e) => {
+    e.preventDefault(); if (setErr('em', vEmail(val('em')))) return;
+    $('#go').disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(val('em').trim(), { redirectTo: base() + '#/reset' });
+    $('#go').disabled = false;
+    $('#fe').innerHTML = error ? `<div class="alert">${esc(error.message)}</div>` : `<div class="alert ok">If an account exists, a reset link is on its way.</div>`;
+  };
+}
+function resetPage() {
+  if (!S.session) { app.innerHTML = `<div class="narrow"><div class="glass"><h1>Link expired</h1><p class="mu">This reset link is invalid or expired.</p><a class="btn pri" href="#/forgot">Request new link</a></div></div>`; return; }
+  app.innerHTML = `<div class="narrow"><div class="glass"><h1>New password</h1><form id="f" novalidate>${field('pw', 'New password', '', { type: 'password', ac: 'new-password' })}${field('pw2', 'Confirm password', '', { type: 'password', ac: 'new-password' })}<div id="fe"></div><button class="btn pri block" style="margin-top:16px">Update password</button></form></div></div>`;
+  $('#f').onsubmit = async (e) => {
+    e.preventDefault();
+    if ([setErr('pw', vPass(val('pw'))), setErr('pw2', val('pw') === val('pw2') ? '' : 'Passwords do not match.')].some(Boolean)) return;
+    const { error } = await sb.auth.updateUser({ password: val('pw') });
+    if (error) $('#fe').innerHTML = `<div class="alert">${esc(error.message)}</div>`; else { toast('Password updated.', 'ok'); go('/dashboard'); }
+  };
+}
+
+/* ---- profile form pieces (shared by onboarding + edit) ---- */
+const blankV = () => ({ display_name: '', username: '', instagram: '', date_of_birth: '', phone_number: '', favourite_anime: '', favourite_male_character: '', favourite_female_character: '' });
+const avatarBlock = (src) => `<div style="text-align:center"><button type="button" id="pick" style="border:0;background:none;cursor:pointer" aria-label="Choose profile picture"><span id="avwrap">${avatar(src, 'You', 110)}</span></button>
+  <input id="file" type="file" accept="image/jpeg,image/png,image/webp" hidden><div class="hint">JPG, PNG or WebP · max 2 MB · picked from your files</div><div class="err" id="av-e"></div></div>${field('display_name', 'Display name', '', { max: 40, ac: 'name' })}`;
+const handleBlock = `${field('username', 'Username', '', { max: 21, attrs: 'autocapitalize="none" autocorrect="off" spellcheck="false"', hint: '3–20 characters: letters, numbers, underscore. Your QR link uses this.' })}<div class="hint" id="ustat"></div>${field('instagram', 'Instagram (optional)', '', { ph: '@handle or instagram.com/handle', attrs: 'autocapitalize="none"' })}`;
+const privBlock = `<div class="alert info">🔒 Your date of birth and phone are <b>private</b>. Only you can read them — never shown on your card, QR, search or public profile.</div>${field('date_of_birth', 'Date of birth', '', { type: 'date', attrs: `max="${new Date().toISOString().slice(0, 10)}"` })}${field('phone_number', 'Mobile number (optional)', '', { type: 'tel', ac: 'tel' })}`;
+const favBlock = `${field('favourite_anime', 'Favourite anime', '', { max: 80 })}${field('favourite_male_character', 'Favourite male character', '', { max: 80 })}${field('favourite_female_character', 'Favourite female character', '', { max: 80 })}`;
+function fillForm(v) { for (const k in v) { const el = $('#' + k); if (el) el.value = v[k] ?? ''; } }
+function readForm() { const v = blankV(); for (const k in v) v[k] = val(k); return v; }
+const CHECKS = {
+  id: (v) => [setErr('display_name', vName(v.display_name))],
+  handle: (v) => [setErr('username', vUser(v.username)), setErr('instagram', parseIg(v.instagram).error || '')],
+  priv: (v) => [setErr('date_of_birth', vDob(v.date_of_birth)), setErr('phone_number', vPhone(v.phone_number))],
+  fav: (v) => ['favourite_anime', 'favourite_male_character', 'favourite_female_character'].map((k) => setErr(k, vFav(v[k]))),
+};
+function bindAvatar(onFile) {
+  $('#pick').onclick = () => $('#file').click();
+  $('#file').onchange = (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    const m = !['image/jpeg', 'image/png', 'image/webp'].includes(f.type) ? 'Use a JPG, PNG or WebP image.' : f.size > 2 * 1024 * 1024 ? 'Image must be 2 MB or smaller.' : '';
+    $('#av-e').textContent = m; if (m) return;
+    onFile(f); $('#avwrap').innerHTML = avatar(URL.createObjectURL(f), 'You', 110);
+  };
+}
+function bindUsernameCheck(own) {
+  let t, n = 0;
+  $('#username').addEventListener('input', () => {
+    clearTimeout(t); const u = normUser(val('username')), st = $('#ustat'); st.textContent = '';
+    if (vUser(u) || u === own) return;
+    st.textContent = 'Checking…'; const my = ++n;
+    t = setTimeout(async () => { const { data, error } = await sb.rpc('is_username_available', { p_username: u }); if (my !== n) return; st.textContent = error ? '' : data ? '✓ Available' : ''; if (!error && !data) setErr('username', 'That username is already taken.'); }, 400);
+  });
+}
+
+function onboardingPage() {
+  const v = blankV(); let step = 0, file = null, preview = null;
+  const meta = S.session.user.user_metadata || {}; v.display_name = String(meta.full_name || meta.name || '').slice(0, 40);
+  const titles = ['Who are you?', 'Pick your handle', 'Private details', 'Your anime taste', 'Preview your card'];
+  const blocks = [() => avatarBlock(preview), () => handleBlock, () => privBlock, () => favBlock];
+  const keys = ['id', 'handle', 'priv', 'fav'];
+  async function draw() {
+    let body = '';
+    if (step < 4) body = blocks[step]();
+    else { const q = await qrData(profileUrl(normUser(v.username)), 360); body = idCard({ public_id: 'PENDING', username: normUser(v.username), display_name: v.display_name, avatar_path: null, favourite_anime: v.favourite_anime, favourite_male_character: v.favourite_male_character, favourite_female_character: v.favourite_female_character }, q, preview) + '<p class="hint" style="text-align:center">Preview only — your final Otaku ID reference is assigned when you finish.</p><div id="fe"></div>'; }
+    app.innerHTML = `<div class="narrow"><div class="row sp">${logo}<span class="mu" style="font-size:12px">Step ${step + 1} of 5</span></div>
+      <div class="steps">${[0, 1, 2, 3, 4].map((i) => `<i class="${i < step ? 'd' : i === step ? 'c' : ''}"></i>`).join('')}</div>
+      <div class="glass"><h1>${titles[step]}</h1>${body}</div>
+      <div class="row" style="margin-top:14px">${step ? '<button class="btn" id="back">← Back</button>' : ''}<button class="btn pri" style="flex:1" id="next">${step === 4 ? 'Finish setup' : 'Continue →'}</button></div></div>`;
+    if (step < 4) { fillForm(v); if (step === 0) bindAvatar((f) => { file = f; preview = URL.createObjectURL(f); }); if (step === 1) bindUsernameCheck(); }
+    if (step) $('#back').onclick = () => { if (step < 4) Object.assign(v, pickKeys(readForm(), step)); step--; draw(); };
+    $('#next').onclick = async () => {
+      if (step < 4) { Object.assign(v, pickKeys(readForm(), step)); if (CHECKS[keys[step]](v).some(Boolean)) return; step++; draw(); return; }
+      $('#next').disabled = true;
+      try { await saveProfile({ isNew: true, v, file }); await loadProfile(); toast('Your Otaku ID is ready!', 'ok'); go('/dashboard'); route(); }
+      catch (e) { $('#fe').innerHTML = `<div class="alert" role="alert">${esc(e.message)}</div>`; $('#next').disabled = false; if (/username/i.test(e.message)) { step = 1; draw(); setErr('username', e.message); } }
+    };
+  }
+  const groups = [['display_name'], ['username', 'instagram'], ['date_of_birth', 'phone_number'], ['favourite_anime', 'favourite_male_character', 'favourite_female_character']];
+  function pickKeys(src, s) { const o = {}; (groups[s] || []).forEach((k) => (o[k] = src[k])); return o; }
+  draw();
+}
+
+function dashboardPage() {
+  const p = S.profile, pr = S.priv;
+  const checks = [!!p.avatar_path, !!p.favourite_anime, !!(p.favourite_male_character && p.favourite_female_character), !!p.instagram_username, !!pr?.date_of_birth];
+  const pct = Math.round(((checks.filter(Boolean).length + 1) / 6) * 100);
+  const rec = getRecent();
+  app.innerHTML = shell('/dashboard', `<p class="mu" style="margin:0">Welcome back,</p><h1>${esc(p.display_name)}</h1>
+   <div class="panel" style="margin-top:16px"><div class="row sp" style="font-size:13px;margin-bottom:8px"><b>Profile ${pct}% complete</b><a href="#/profile">Edit</a></div><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><div style="width:${pct}%"></div></div></div>
+   <div id="cardbox"></div>
+   <div class="grid3" style="margin:16px 0"><a class="panel" style="text-align:center;margin:0;color:var(--tx)" href="#/my-qr">▦<br>My QR</a><a class="panel" style="text-align:center;margin:0;color:var(--tx)" href="#/scan">📷<br>Scan QR</a><a class="panel" style="text-align:center;margin:0;color:var(--tx)" href="#/search">🔍<br>Search</a></div>
+   <h2>Recent discoveries</h2>${rec.length ? rec.map((r) => `<a class="panel row" style="color:var(--tx);flex-wrap:nowrap" href="#/u/${esc(r.username)}">${avatar(avatarUrl(r.avatar_path), r.display_name, 44)}<span><b>${esc(r.display_name)}</b><br><span style="color:var(--cy);font-size:12px">@${esc(r.username)}</span></span></a>`).join('') : '<p class="panel mu">Profiles you open will show up here.</p>'}`);
+  qrData(profileUrl(p.username), 360).then((q) => ($('#cardbox').innerHTML = idCard(p, q)));
+}
+
+function profilePage() {
+  const p = S.profile, pr = S.priv, u = S.session.user;
+  app.innerHTML = shell('/profile', `<div class="row sp"><h1>My profile</h1><div class="row"><button class="btn" id="share">Share</button><button class="btn pri" id="edit">Edit</button></div></div><div id="cardbox" style="margin:16px 0"></div>
+   <div class="panel"><h2>Public details</h2><p class="mu">Visibility: <b style="color:var(--tx)">${p.profile_visibility === 'public' ? 'Public' : 'Private'}</b></p>${p.instagram_username ? `<a href="https://instagram.com/${esc(p.instagram_username)}" target="_blank" rel="noopener noreferrer">📷 @${esc(p.instagram_username)}</a>` : ''}</div>
+   <div class="panel"><h2>🔒 Only you can see this</h2><p>Email: <span class="mu">${esc(u.email)}</span></p><p>Date of birth: <span class="mu">${pr?.date_of_birth ? esc(pr.date_of_birth) + ' (age ' + ageOf(pr.date_of_birth) + ')' : 'Not set'}</span></p><p>Mobile: <span class="mu">${esc(pr?.phone_number) || 'Not set'}</span></p></div>`);
+  qrData(profileUrl(p.username), 360).then((q) => ($('#cardbox').innerHTML = idCard(p, q)));
+  $('#share').onclick = () => shareLink(p.username);
+  $('#edit').onclick = () => editProfile();
+}
+async function shareLink(username) {
+  const url = profileUrl(username);
+  try { if (navigator.share) { await navigator.share({ title: 'My Otaku ID', text: `Check out @${username} on OTAKU ID`, url }); return; } await navigator.clipboard.writeText(url); toast('Profile link copied.', 'ok'); }
+  catch (e) { if (e && e.name !== 'AbortError') toast('Could not share. Copy the link from My QR.', 'bad'); }
+}
+function editProfile() {
+  const p = S.profile, pr = S.priv; let file = null;
+  app.innerHTML = shell('/profile', `<div class="row sp"><h1>Edit profile</h1><button class="btn ghost" id="cancel">✕</button></div><div class="glass" style="margin-top:14px">${avatarBlock(avatarUrl(p.avatar_path))}${handleBlock}<div class="alert info" id="warn" hidden>Changing your username changes your profile link — QR codes you already shared will stop working.</div>${favBlock}${privBlock}<div id="fe"></div>
+   <div class="row" style="margin-top:18px"><button class="btn" id="cancel2">Cancel</button><button class="btn pri" style="flex:1" id="save">Save changes</button></div></div>`);
+  fillForm({ display_name: p.display_name, username: p.username, instagram: p.instagram_username, date_of_birth: pr?.date_of_birth, phone_number: pr?.phone_number, favourite_anime: p.favourite_anime, favourite_male_character: p.favourite_male_character, favourite_female_character: p.favourite_female_character });
+  bindAvatar((f) => (file = f)); bindUsernameCheck(p.username);
+  $('#username').addEventListener('input', () => ($('#warn').hidden = normUser(val('username')) === p.username));
+  $('#cancel').onclick = $('#cancel2').onclick = () => profilePage();
+  $('#save').onclick = async () => {
+    const v = readForm();
+    if (Object.values(CHECKS).flatMap((c) => c(v)).some(Boolean)) return;
+    $('#save').disabled = true;
+    try { await saveProfile({ isNew: false, v, file }); await loadProfile(); toast('Profile updated.', 'ok'); profilePage(); }
+    catch (e) { $('#fe').innerHTML = `<div class="alert" role="alert">${esc(e.message)}</div>`; $('#save').disabled = false; }
+  };
+}
+
+async function publicPage(param) {
+  const username = normUser(decodeURIComponent(param || ''));
+  const top = `<div class="top"><a href="${S.session ? '#/dashboard' : '#/'}">${logo}</a>${S.session ? '<a class="btn ghost" href="#/search">← Back</a>' : '<a class="btn ghost" href="#/login">Log in</a>'}</div>`;
+  app.innerHTML = `<div class="narrow">${top}<p class="mu" style="text-align:center">Loading profile…</p></div>`;
+  if (!USER_RE.test(username)) return notFoundProfile(top, username);
+  const { data, error } = await sb.rpc('get_public_profile', { p_username: username });
+  if (location.hash !== '#/u/' + param) return; // user navigated away
+  if (error) { app.innerHTML = `<div class="narrow">${top}<div class="alert">Could not load this profile: ${esc(error.message)}</div></div>`; return; }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return notFoundProfile(top, username);
+  pushRecent({ username: row.username, display_name: row.display_name, avatar_path: row.avatar_path });
+  app.innerHTML = `<div class="narrow">${top}<div id="cardbox"></div><div class="row" style="justify-content:center;margin-top:16px"><button class="btn pri" id="share">Share</button>${row.instagram_username ? `<a class="btn" href="https://instagram.com/${esc(row.instagram_username)}" target="_blank" rel="noopener noreferrer">📷 @${esc(row.instagram_username)}</a>` : ''}</div>
+   ${row.age != null ? `<p class="mu" style="text-align:center">Age ${row.age}</p>` : ''}${S.session ? '' : '<div class="glass" style="text-align:center;margin-top:16px"><p class="mu">Get your own anime identity card.</p><a class="btn pri" href="#/signup">Create My Otaku ID</a></div>'}</div>`;
+  $('#share').onclick = () => shareLink(row.username);
+  qrData(profileUrl(row.username), 360).then((q) => ($('#cardbox').innerHTML = idCard(row, q)));
+}
+function notFoundProfile(top, username) {
+  app.innerHTML = `<div class="narrow">${top}<div class="panel" style="text-align:center"><h2>Profile not found</h2><p class="mu">We couldn't find a public profile for @${esc(username)}. It may not exist, or its owner made it private.</p><a class="btn pri" href="${S.session ? '#/search' : '#/'}">${S.session ? 'Search fans' : 'Go home'}</a></div></div>`;
+}
+
+function searchPage() {
+  app.innerHTML = shell('/search', `<h1>Search fans</h1><div style="margin:14px 0"><input id="q" type="search" placeholder="Search by username…" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Search by username" style="min-height:52px;font-size:16px"></div><div id="res"><p class="panel mu">Search by exact or partial username. Only public profiles appear here.</p></div>`);
+  let t, n = 0; $('#q').focus();
+  $('#q').oninput = () => {
+    clearTimeout(t); const q = normUser(val('q')), res = $('#res');
+    if (!q) { res.innerHTML = '<p class="panel mu">Search by exact or partial username.</p>'; return; }
+    if (!/^[a-z0-9_]*$/.test(q)) { res.innerHTML = '<div class="alert">Usernames only contain letters, numbers and underscores.</div>'; return; }
+    if (q.length < 2) { res.innerHTML = '<p class="mu">Type at least 2 characters.</p>'; return; }
+    res.innerHTML = '<p class="mu">Searching…</p>'; const my = ++n;
+    t = setTimeout(async () => {
+      const { data, error } = await sb.rpc('search_public_profiles', { p_query: q, p_limit: 20 }); if (my !== n) return;
+      if (error) { res.innerHTML = `<div class="alert">Search failed: ${esc(error.message)}</div>`; return; }
+      res.innerHTML = data.length ? data.map((r) => `<div class="panel"><div class="row" style="flex-wrap:nowrap">${avatar(avatarUrl(r.avatar_path), r.display_name, 52)}<div style="flex:1;min-width:0"><b>${esc(r.display_name)}</b><br><span style="color:var(--cy);font-size:13px">@${esc(r.username)}</span>${r.favourite_anime ? `<br><span class="mu" style="font-size:12px">${esc(r.favourite_anime)}</span>` : ''}</div><button class="btn ghost" data-qr="${esc(r.username)}" aria-label="Show QR for @${esc(r.username)}">▦</button><a class="btn" href="#/u/${esc(r.username)}">Open</a></div><div data-qrbox="${esc(r.username)}" style="text-align:center"></div></div>`).join('') : `<div class="panel" style="text-align:center"><h2>No fans found</h2><p class="mu">Nobody public matches "${esc(q)}".</p></div>`;
+      res.querySelectorAll('[data-qr]').forEach((b) => (b.onclick = async () => { const box = res.querySelector(`[data-qrbox="${b.dataset.qr}"]`); box.innerHTML = box.innerHTML ? '' : `<img class="qrimg" style="margin-top:10px" width="170" height="170" src="${await qrData(profileUrl(b.dataset.qr), 320)}" alt="QR code">`; }));
+    }, 350);
+  };
+}
+
+function scanPage() {
+  app.innerHTML = shell('/scan', `<h1>Scan QR</h1><div style="position:relative;max-width:380px;margin:14px auto"><video id="vid" muted playsinline hidden></video><div id="ph" class="panel" style="aspect-ratio:1;display:grid;place-items:center;text-align:center;border-radius:24px;border-color:rgba(139,92,246,.5)"><div><div style="font-size:40px">📷</div><p class="mu">The camera only turns on after you tap Start scanning.</p></div></div></div>
+   <div class="row" style="justify-content:center"><button class="btn pri" id="start">Start scanning</button></div><div id="se"></div>
+   <form id="mf" class="glass" style="margin-top:20px" novalidate><h2>⌨ Enter a username instead</h2>${field('manual', 'Username or profile link', '', { ph: 'username or profile link', attrs: 'autocapitalize="none" autocorrect="off" spellcheck="false"' })}<button class="btn block" style="margin-top:12px">Open profile</button></form>`);
+  let stream = null, raf = 0, lastBad = '';
+  const stop = () => { cancelAnimationFrame(raf); stream?.getTracks().forEach((t) => t.stop()); stream = null; };
+  cleanup = stop;
+  const fail = (title, body) => { stop(); $('#vid').hidden = true; $('#ph').hidden = false; $('#ph').innerHTML = `<div><div style="font-size:40px">🚫</div><b>${title}</b><p class="mu">${body}</p></div>`; $('#start').textContent = 'Try again'; $('#start').disabled = false; };
+  $('#start').onclick = async () => {
+    if (stream) { stop(); $('#vid').hidden = true; $('#ph').hidden = false; $('#start').textContent = 'Start scanning'; return; }
+    if (!navigator.mediaDevices?.getUserMedia) return fail('Camera not supported', 'Open this page over HTTPS (not file://) or use manual entry below.');
+    $('#start').disabled = true; $('#se').innerHTML = '';
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); }
+    catch (e) { return fail(e.name === 'NotAllowedError' ? 'Camera access was blocked' : e.name === 'NotFoundError' ? 'No camera found' : 'Camera could not start', 'Allow camera access in your browser settings, or use manual entry below.'); }
+    const v = $('#vid'); v.srcObject = stream; await v.play(); v.hidden = false; $('#ph').hidden = true; $('#start').textContent = 'Stop'; $('#start').disabled = false;
+    const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true });
+    const tick = () => {
+      if (!stream) return;
+      if (v.readyState >= 2 && v.videoWidth) {
+        c.width = v.videoWidth; c.height = v.videoHeight; x.drawImage(v, 0, 0);
+        const r = jsQR(x.getImageData(0, 0, c.width, c.height).data, c.width, c.height);
+        if (r?.data) { const p = parseScanned(r.data); if (p.username) { stop(); go('/u/' + p.username); return; } if (r.data !== lastBad) { lastBad = r.data; $('#se').innerHTML = `<div class="alert" role="alert">${esc(p.error)}</div>`; } }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+  };
+  $('#mf').onsubmit = (e) => { e.preventDefault(); const p = parseScanned(val('manual')); if (setErr('manual', p.error || '')) return; stop(); go('/u/' + p.username); };
+}
+
+function myQrPage() {
+  const p = S.profile, url = profileUrl(p.username);
+  app.innerHTML = shell('/my-qr', `<h1>My QR</h1><div style="max-width:340px;margin:16px auto;padding:2px;border-radius:24px;background:linear-gradient(135deg,var(--vio),var(--cy))"><div style="background:var(--s1);border-radius:22px;padding:22px;text-align:center">${logo}<div id="qrbox" style="margin:14px auto;max-width:260px"></div><div class="disp" style="font-size:1.3rem;font-weight:700">@${esc(p.username)}</div><div class="mu" style="font-size:11px;word-break:break-all">${esc(url)}</div></div></div>
+   <p class="mu" style="text-align:center;font-size:12px;max-width:340px;margin:0 auto 14px">This QR only contains your public profile link — never your email, phone, birthday or any secret.</p>
+   ${location.protocol === 'file:' && !SITE_URL ? '<div class="alert info">You opened this as a local file, so the link inside the QR points to this file on your device. Host the page and set SITE_URL for QR codes others can open.</div>' : ''}
+   <div class="row" style="max-width:340px;margin:0 auto"><button class="btn pri" style="flex:1" id="dq">⬇ QR image</button><button class="btn" style="flex:1" id="dc">🖼 ID card</button></div>
+   <div class="row" style="max-width:340px;margin:10px auto"><button class="btn" style="flex:1" id="sh">Share</button><button class="btn" style="flex:1" id="cp">Copy link</button></div>
+   <h2 style="text-align:center;margin:22px 0 12px">Your ID card</h2><div id="cardbox"></div>`);
+  const dl = (href, name) => { const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+  qrData(url, 720).then((q) => { $('#qrbox').innerHTML = `<img class="qrimg" style="width:100%;height:auto" src="${q}" alt="QR code for @${esc(p.username)}">`; $('#cardbox').innerHTML = idCard(p, q); });
+  $('#dq').onclick = async () => { dl(await qrData(url, 1200), `otaku-id-${p.username}-qr.png`); toast('QR image saved.', 'ok'); };
+  $('#dc').onclick = async () => { try { dl(await htmlToImage.toPng($('#idcard'), { pixelRatio: 3, cacheBust: true, backgroundColor: '#09090F' }), `otaku-id-${p.username}-card.png`); toast('ID card saved.', 'ok'); } catch { toast('Could not render the card image.', 'bad'); } };
+  $('#sh').onclick = () => shareLink(p.username);
+  $('#cp').onclick = async () => { try { await navigator.clipboard.writeText(url); toast('Link copied.', 'ok'); } catch { toast('Copy failed.', 'bad'); } };
+}
+
+function settingsPage() {
+  const p = S.profile, st = S.settings || { show_instagram: true, show_age: false };
+  const tog = (id, l, d, on) => `<div class="row sp" style="flex-wrap:nowrap;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06)"><div><b>${l}</b><div class="hint">${d}</div></div><button class="sw ${on ? 'on' : ''}" id="${id}" role="switch" aria-checked="${on}" aria-label="${l}"></button></div>`;
+  app.innerHTML = shell('/settings', `<h1>Settings &amp; privacy</h1>
+   <div class="panel" style="margin-top:16px"><h2>Account</h2><p class="mu">Signed in as ${esc(S.session.user.email)}</p><a class="btn" href="#/profile">✎ Edit personal profile</a></div>
+   <div class="panel"><h2>Privacy</h2>${tog('t-pub', 'Public profile', 'When off, only you can open your card; QR and search stop working for others.', p.profile_visibility === 'public')}${tog('t-ig', 'Show Instagram', 'Display your Instagram on your public profile.', st.show_instagram)}${tog('t-age', 'Show my age', 'Shows your age — never your birth date.', st.show_age)}
+    <p class="hint">🛡 Email, date of birth and phone are never shown publicly. They live in a table only you can read.</p></div>
+   <div class="panel"><h2>Session</h2><button class="btn" id="out">Log out</button></div>
+   <div class="panel" style="border-color:rgba(248,113,113,.3)"><h2 style="color:var(--bad)">Danger zone</h2><p class="mu">Permanently deletes your profile, private details, avatar and login.</p><button class="btn bad" id="del">🗑 Delete my account</button></div>`);
+  const flip = async (id, fn) => { const b = $('#' + id); b.disabled = true; const { error } = await fn(!b.classList.contains('on')); b.disabled = false; if (error) return toast(dbErr(error), 'bad'); await loadProfile(); toast('Saved.', 'ok'); settingsPage(); };
+  $('#t-pub').onclick = () => flip('t-pub', (on) => sb.from('profiles').update({ profile_visibility: on ? 'public' : 'private' }).eq('id', p.id));
+  const setting = (k) => (on) => sb.from('profile_settings').upsert({ user_id: p.id, show_instagram: st.show_instagram, show_age: st.show_age, [k]: on }, { onConflict: 'user_id' });
+  $('#t-ig').onclick = () => flip('t-ig', setting('show_instagram'));
+  $('#t-age').onclick = () => flip('t-age', setting('show_age'));
+  $('#out').onclick = async () => { await sb.auth.signOut(); go('/'); };
+  $('#del').onclick = () => {
+    const m = document.createElement('div'); m.className = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
+    m.innerHTML = `<div class="glass"><h2 style="color:var(--bad)">Delete account?</h2><p class="mu">Type <b style="color:var(--tx);font-family:monospace">${esc(p.username)}</b> to confirm. This cannot be undone.</p><input id="ct" aria-label="Type your username to confirm" autocapitalize="none"><div id="de"></div><div class="row" style="margin-top:14px"><button class="btn" id="cn" style="flex:1">Cancel</button><button class="btn bad" id="ok" style="flex:1" disabled>Delete</button></div></div>`;
+    document.body.appendChild(m); $('#ct', m).focus();
+    $('#ct', m).oninput = (e) => ($('#ok', m).disabled = e.target.value.trim().toLowerCase() !== p.username);
+    $('#cn', m).onclick = () => m.remove();
+    $('#ok', m).onclick = async () => {
+      $('#ok', m).disabled = true;
+      try {
+        const l = await sb.storage.from(BUCKET).list(p.id); if (l.data?.length) await sb.storage.from(BUCKET).remove(l.data.map((f) => `${p.id}/${f.name}`));
+        const { error } = await sb.rpc('delete_my_account'); if (error) throw new Error(dbErr(error));
+        await sb.auth.signOut({ scope: 'local' }); m.remove(); toast('Your account has been deleted.', 'ok'); go('/');
+      } catch (e) { $('#de', m).innerHTML = `<div class="alert">${esc(e.message)}</div>`; $('#ok', m).disabled = false; }
+    };
+  };
+}
+
+/* ================= ROUTER ================= */
+async function route() {
+  if (cleanup) { cleanup(); cleanup = null; }
+  if (!S.ready) return;
+  const path = (location.hash.replace(/^#/, '') || '/'), [, first, second] = path.split('/'), root = '/' + (first || '');
+  const authed = !!S.session;
+  if (root === '/u') return publicPage(second);
+  if (root === '/reset') return resetPage();
+  if (['/', '/login', '/signup', '/forgot'].includes(root) || path === '/') {
+    if (authed) return go(S.profile ? '/dashboard' : '/onboarding');
+    return ({ '/': landing, '/login': loginPage, '/signup': signupPage, '/forgot': forgotPage }[root] || landing)();
+  }
+  const protectedPages = { '/dashboard': dashboardPage, '/profile': profilePage, '/search': searchPage, '/scan': scanPage, '/my-qr': myQrPage, '/settings': settingsPage, '/onboarding': onboardingPage };
+  if (protectedPages[root]) {
+    if (!authed) return go('/login');
+    if (S.profileError) { app.innerHTML = `<div class="narrow"><div class="glass"><h1>Couldn't load your profile</h1><div class="alert">${esc(S.profileError)}</div><p class="hint">If this mentions missing tables, run the SQL migration on the OTAKU ID Supabase project.</p><button class="btn pri" onclick="boot()">Try again</button></div></div>`; return; }
+    if (root === '/onboarding') return S.profile ? go('/dashboard') : onboardingPage();
+    if (!S.profile) return go('/onboarding');
+    return protectedPages[root]();
+  }
+  app.innerHTML = `<div class="narrow"><div class="panel" style="text-align:center"><h2>404 — Lost in the anime multiverse</h2><a class="btn pri" href="#/">Back home</a></div></div>`;
+}
+window.addEventListener('hashchange', route);
+
+async function boot() {
+  app.innerHTML = '<p class="mu" style="text-align:center;margin-top:30vh">Loading OTAKU ID…</p>';
+  const { data } = await sb.auth.getSession(); S.session = data.session;
+  S.profileError = await loadProfile(); S.ready = true; route();
+}
+sb.auth.onAuthStateChange(async (event, session) => {
+  const was = S.session?.user.id; S.session = session;
+  if (!S.ready) return;
+  if (event === 'PASSWORD_RECOVERY') { go('/reset'); return; }
+  if (event === 'SIGNED_IN' && session?.user.id === was) return; // token refresh / tab focus
+  setTimeout(async () => { S.profileError = await loadProfile(); route(); }, 0); // avoid deadlock inside the auth callback
+});
+window.boot = boot;
+boot();
+</script>
+</body>
+</html>
